@@ -1,14 +1,14 @@
-import { Calendar, CreditCard, Wallet } from "lucide-react"
-import List01 from "./list-01"
-import List02 from "./list-02"
-import List03 from "./list-03"
+import { Calendar, CreditCard, Wallet } from 'lucide-react';
+import List01 from './list-01';
+import List02 from './list-02';
+import List03 from './list-03';
 
-export default function () {
+export default function Content() {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="bg-white dark:bg-[#0F0F12] rounded-xl p-6 flex flex-col border border-gray-200 dark:border-[#1F1F23]">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 text-left flex items-center gap-2 ">
+          <h2 className="flex items-center gap-2 mb-4 text-lg font-bold text-left text-gray-900 dark:text-white ">
             <Wallet className="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-50" />
             Accounts
           </h2>
@@ -17,7 +17,7 @@ export default function () {
           </div>
         </div>
         <div className="bg-white dark:bg-[#0F0F12] rounded-xl p-6 flex flex-col border border-gray-200 dark:border-[#1F1F23]">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 text-left flex items-center gap-2">
+          <h2 className="flex items-center gap-2 mb-4 text-lg font-bold text-left text-gray-900 dark:text-white">
             <CreditCard className="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-50" />
             Recent Transactions
           </h2>
@@ -28,13 +28,12 @@ export default function () {
       </div>
 
       <div className="bg-white dark:bg-[#0F0F12] rounded-xl p-6 flex flex-col items-start justify-start border border-gray-200 dark:border-[#1F1F23]">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 text-left flex items-center gap-2">
+        <h2 className="flex items-center gap-2 mb-4 text-lg font-bold text-left text-gray-900 dark:text-white">
           <Calendar className="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-50" />
           Upcoming Events
         </h2>
         <List03 />
       </div>
     </div>
-  )
+  );
 }
-
