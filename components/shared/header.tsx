@@ -11,7 +11,7 @@ function Header() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background px-4 shadow-sm md:px-6 dark:bg-zinc-800',
+        'sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background px-4 shadow-sm md:px-6 dark:bg-zinc-900 dark:border-zinc-950',
         {
           hidden: isAdminRoute,
         },

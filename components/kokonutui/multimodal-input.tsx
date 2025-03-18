@@ -3,16 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import {
-  Ban,
-  FileText,
-  Languages,
-  LineChart,
-  Search,
-  SendIcon,
-  ShieldCheck,
-  User,
-} from 'lucide-react';
+import { LineChart, SendIcon, ShieldCheck, User } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 

@@ -13,12 +13,15 @@ import {
 import { useChatWithBlog } from '@/hooks/mutation';
 import { cn, getUserShortName } from '@/lib/utils';
 import useChatStore from '@/store/chat';
+import { motion } from 'framer-motion';
 import {
   Check,
   CirclePause,
   Copy,
-  Volume,
-  Volume1,
+  LineChart,
+  SendIcon,
+  ShieldCheck,
+  User,
   Volume2,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -26,11 +29,30 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import Markdown from 'react-markdown';
 import '../../app/globals.css';
-import { ArrowUpIcon } from '../icons';
-
 interface MainResponseSectionProps {
   isDivisionOption: boolean;
 }
+
+const QuickActions = [
+  {
+    action: 'Market Data',
+    icon: LineChart,
+    gradient: 'from-zinc-900/50 to-black/50',
+    hoverGradient: 'hover:from-zinc-800/50 hover:to-zinc-900/50',
+  },
+  {
+    action: 'Cybersecurity',
+    icon: ShieldCheck,
+    gradient: 'from-zinc-900/50 to-black/50',
+    hoverGradient: 'hover:from-zinc-800/50 hover:to-zinc-900/50',
+  },
+  {
+    action: 'AppnologyJames',
+    icon: User,
+    gradient: 'from-zinc-900/50 to-black/50',
+    hoverGradient: 'hover:from-zinc-800/50 hover:to-zinc-900/50',
+  },
+];
 
 export default function MainResponseSection({
   isDivisionOption,
@@ -47,7 +69,7 @@ export default function MainResponseSection({
     console.log(streamText);
   }, [streamText]);
   return (
-    <main className="max-w-6xl mx-auto flex flex-1 flex-col justify-center">
+    <main className="flex flex-col justify-center flex-1 max-w-6xl mx-auto ">
       <div className={cn('flex-1 p-4 sm:p-6 !overflow-y-auto hide-scrollbar')}>
         <div
           className={cn('', {
@@ -55,7 +77,7 @@ export default function MainResponseSection({
             'max-w-full': !showEmptyActivity,
           })}
         >
-          <div className="mb-4 space-y-3 pt-14 pb-10 hide-scrollbar">
+          <div className="pb-10 mb-4 space-y-3 pt-14 hide-scrollbar">
             {chat.map((i, k) => (
               <ChatMessage
                 key={k}
@@ -84,22 +106,30 @@ export default function MainResponseSection({
 
 function EmptyActivity() {
   return (
-    <div className="w-full flex justify-center items-center">
-      <div className="mt-36 flex flex-col justify-center items-center w-full">
-        <Icon className="w-24" src="ai" />
-        <span className="text-[#707070] text-xl font-medium mt-3">
-          Hi, your blog assistant is here
-        </span>
-      </div>
-    </div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.7 }}
+      className={cn(
+        'relative z-30 pt-32 text-center pb-20',
+        'opacity-100 scale-100',
+      )}
+    >
+      <h1 className="relative z-30 mb-4 text-5xl font-medium tracking-tighter text-black md:text-6xl bg-clip-text bg-gradient-to-b from-gray-800 to-gray-600 dark:text-white dark:bg-gradient-to-b dark:from-black dark:to-black/70">
+        Welcome to Knowledge Chat
+      </h1>
+      <p className="relative z-30 text-xl text-gray-600 dark:text-zinc-400">
+        What can I do for you today?
+      </p>
+    </motion.div>
   );
 }
 
 const PromptCard = (props: { prompt: string; icon: string }) => {
   return (
-    <div className="rounded-lg border p-3 cursor-pointer">
+    <div className="p-3 border rounded-lg cursor-pointer">
       <Icon src={props.icon} />
-      <p className="mt-4 font-normal text-xs">{props.prompt}</p>
+      <p className="mt-4 text-xs font-normal">{props.prompt}</p>
     </div>
   );
 };
@@ -111,12 +141,6 @@ function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
   const ChatStore = useChatStore();
   const { mutate: requestChatWithPdf, isPending: isProcessing } =
     useChatWithBlog();
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSubmit(e);
-    }
-  };
 
   const handleStream = async (response: Response) => {
     const reader = response.body?.getReader();
@@ -165,34 +189,95 @@ function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
     );
   };
   return (
-    <div className="sticky bottom-7 md:bottom-1 bg-background px-4 py-2 shadow-sm sm:px-6">
-      <div className="relative">
-        <Textarea
-          placeholder="Type your message..."
-          onChange={(e) => setPrompt(e.target.value)}
-          value={prompt}
-          name="message"
-          id="message"
-          rows={3}
-          onKeyDown={handleKeyDown}
-          className="min-h-[48px] rounded-2xl resize-none p-4 border border-neutral-400 shadow-sm pr-16"
-        />
-        <Button
-          type="submit"
-          size="icon"
-          disabled={isProcessing}
-          className="absolute w-8 h-8 top-3 right-3"
-          onClick={handleSubmit}
-        >
-          {isProcessing ? (
-            <Loader className="w-3 h-3" />
-          ) : (
-            <Fragment>
-              <ArrowUpIcon className="w-4 h-4" />
-              <span className="sr-only">Send</span>
-            </Fragment>
-          )}
-        </Button>
+    <div className="sticky px-4 py-2 shadow-sm bottom-7 md:bottom-8 sm:px-6">
+      <div className="flex flex-col w-full max-w-3xl gap-4 mx-auto">
+        <div className="relative bg-white border-none dark:bg-zinc-900 rounded-xl">
+          <Textarea
+            placeholder="What would you like to do?"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
+            className={cn(
+              'w-full px-4 py-3',
+              'resize-none',
+              'bg-transparent',
+              'border-none',
+              'text-gray-800 dark:text-zinc-100 text-base',
+              'focus:outline-none',
+              'focus-visible:ring-0 focus-visible:ring-offset-0',
+              'placeholder:text-gray-500 dark:placeholder:text-zinc-500 placeholder:text-base',
+              'min-h-[60px]',
+            )}
+          />
+          <div className="flex items-center justify-end p-3">
+            <Button
+              className={cn(
+                'px-1.5 py-1.5 h-6 rounded-lg text-sm transition-colors hover:bg-gray-200 dark:hover:bg-zinc-800 flex items-center justify-between gap-1',
+                'text-gray-800 dark:text-zinc-100',
+                'disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-zinc-900',
+              )}
+              disabled={prompt.length === 0}
+              onClick={() => {
+                console.log('Sending message:', prompt);
+              }}
+            >
+              {isProcessing ? (
+                <Loader className="w-3 h-3" />
+              ) : (
+                <Fragment>
+                  <SendIcon className="w-4 h-4" />
+                  <span className="sr-only">Send</span>
+                </Fragment>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid w-full gap-2 sm:grid-cols-3">
+          {QuickActions.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{
+                  delay: 0.1 * index,
+                  duration: 0.4,
+                  ease: 'easeOut',
+                }}
+                key={index}
+                className={`${index > 1 ? 'hidden sm:block' : 'block'} h-full`}
+              >
+                <button
+                  type="button"
+                  className="group w-full h-full text-left rounded-lg p-2.5
+                                    bg-white dark:bg-zinc-900 hover:bg-gray-200 dark:hover:bg-zinc-800
+                                    border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700
+                                    transition-colors duration-300
+                                    flex flex-col justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-md bg-gray-200 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700">
+                      <Icon
+                        size={14}
+                        className="text-gray-800 dark:text-zinc-100"
+                      />
+                    </div>
+                    <div className="text-xs font-medium text-gray-800 dark:text-zinc-100">
+                      {item.action}
+                    </div>
+                  </div>
+                </button>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -217,7 +302,7 @@ function ChatMessage(props: {
         />
         <AvatarFallback>{getUserShortName(props.userName)}</AvatarFallback>
       </Avatar>
-      <div className="grid gap-1 items-start text-sm">
+      <div className="grid items-start gap-1 text-sm">
         <div className="flex items-center gap-2">
           <div className="font-medium">{props.userName}</div>
         </div>
@@ -254,7 +339,7 @@ function CopyToClipboard({ text }: { text: string }) {
       <Tooltip>
         <TooltipTrigger asChild>
           <span
-            className="text-slate-500 group hover:bg-muted cursor-pointer w-6 flex justify-center items-center rounded-md"
+            className="flex items-center justify-center w-6 rounded-md cursor-pointer text-slate-500 group hover:bg-muted"
             onClick={handleCopy}
           >
             {copied ? <Check className="w-3" /> : <Copy className="w-3" />}
@@ -291,7 +376,7 @@ function ReadAloud({ text }: { text: string }) {
       <Tooltip>
         <TooltipTrigger asChild>
           <span
-            className="text-slate-500 group hover:bg-muted cursor-pointer w-6 flex justify-center items-center rounded-md"
+            className="flex items-center justify-center w-6 rounded-md cursor-pointer text-slate-500 group hover:bg-muted"
             onClick={handleReadAloud}
           >
             {isReading ? (
