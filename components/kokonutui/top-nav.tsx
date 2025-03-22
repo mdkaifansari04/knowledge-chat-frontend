@@ -21,20 +21,13 @@ export default function TopNav() {
       <div className="font-medium text-sm hidden sm:flex items-center space-x-1 truncate max-w-[300px]">
         {breadcrumbs.map((item, index) => (
           <div key={item.label} className="flex items-center">
-            {index > 0 && (
-              <ChevronRight className="w-4 h-4 mx-1 text-gray-500 dark:text-gray-400" />
-            )}
+            {index > 0 && <ChevronRight className="w-4 h-4 mx-1 text-gray-500 dark:text-gray-400" />}
             {item.href ? (
-              <Link
-                href={item.href}
-                className="text-gray-700 transition-colors dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
-              >
+              <Link href={item.href} className="text-gray-700 transition-colors dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">
                 {item.label}
               </Link>
             ) : (
-              <span className="text-gray-900 dark:text-gray-100">
-                {item.label}
-              </span>
+              <span className="text-gray-900 dark:text-gray-100">{item.label}</span>
             )}
           </div>
         ))}
@@ -48,7 +41,6 @@ export default function TopNav() {
           <Bell className="w-4 h-4 text-gray-600 sm:h-5 sm:w-5 dark:text-gray-300" />
         </button> */}
         <ThemeToggle />
-        <UserProfile />
       </div>
     </nav>
   );
