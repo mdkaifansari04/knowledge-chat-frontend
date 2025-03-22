@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '../theme-toggle';
 import Logo from './logo';
 import UserProfile from './user-profile';
+import { SignedIn } from '@clerk/nextjs';
 
 function Header() {
   const pathname = usePathname().split('/');
@@ -19,7 +20,9 @@ function Header() {
       </div>
       <div className="flex gap-3">
         <ThemeToggle />
-        <UserProfile />
+        <SignedIn>
+          <UserProfile />
+        </SignedIn>
       </div>
     </header>
   );
