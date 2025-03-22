@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/nextjs';
 import { LogOut, MoveUpRight, Settings, CreditCard, FileText } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,21 +11,15 @@ interface MenuItem {
   external?: boolean;
 }
 
-interface Profile01Props {
+interface ProfileProps {
   name: string;
   email: string;
   avatar: string;
   subscription?: string;
 }
 
-const defaultProfile = {
-  name: 'Kaif',
-  email: 'amdkaif843@gmail.com',
-  avatar: 'https://ferf1mheo22r9ira.public.blob.vercel-storage.com/avatar-02-albo9B0tWOSLXCVZh9rX9KFxXIVWMr.png',
-  subscription: '10',
-} satisfies Required<Profile01Props>;
-
-export default function Profile01({ name = defaultProfile.name, email = defaultProfile.email, avatar = defaultProfile.avatar, subscription = defaultProfile.subscription }: Partial<Profile01Props> = defaultProfile) {
+export default function Profile({ name, email, avatar, subscription }: ProfileProps) {
+  const { signOut } = useClerk();
   const menuItems: MenuItem[] = [
     {
       label: 'Credits',
@@ -67,7 +62,7 @@ export default function Profile01({ name = defaultProfile.name, email = defaultP
             ))}
 
             <button type="button" className="flex items-center justify-between w-full p-2 transition-colors duration-200 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-              <div className="flex items-center gap-2">
+              <div onClick={() => signOut()} className="flex items-center gap-2">
                 <LogOut className="w-4 h-4" />
                 <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Logout</span>
               </div>

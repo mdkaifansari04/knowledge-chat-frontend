@@ -18,3 +18,5 @@ export const PROMPT_CARDS = [
     icon: 'barchart',
   },
 ] as const;
+
+export const CUSTOM_PROFILE_URL = 'https://ferf1mheo22r9ira.public.blob.vercel-storage.com/avatar-01-n0x8HFv8EUetf9z6ht0wScJKoTHqf8.png';
