@@ -21,13 +21,13 @@ interface ProfileProps {
 export default function Profile({ name, email, avatar, subscription }: ProfileProps) {
   const { signOut } = useClerk();
   const menuItems: MenuItem[] = [
-    {
-      label: 'Credits',
-      value: subscription,
-      href: '#',
-      icon: <CreditCard className="w-4 h-4" />,
-      external: false,
-    },
+    // {
+    //   label: 'Credits',
+    //   value: subscription,
+    //   href: '#',
+    //   icon: <CreditCard className="w-4 h-4" />,
+    //   external: false,
+    // },
   ];
 
   return (

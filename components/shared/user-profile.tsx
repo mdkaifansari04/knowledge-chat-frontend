@@ -2,7 +2,7 @@
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import Image from 'next/image';
-import Profile from '../kokonutui/profile-01';
+import Profile from '../kokonutui/profile';
 import { useUser } from '@clerk/nextjs';
 import { CUSTOM_PROFILE_URL } from '@/lib/constant';
 function UserProfile() {
