@@ -116,7 +116,7 @@ export default function KnowledgeBaseIndexPage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container px-4 py-8 mx-auto">
         {/* Header Section */}
         <header className="mb-8">
@@ -200,7 +200,7 @@ export default function KnowledgeBaseIndexPage() {
                     <span className="text-xs text-gray-400 truncate max-w-[150px]" title={kb._id}>
                       ID: {kb._id}
                     </span>
-                    <Link href={`/admin/upload/${kb._id}`}>
+                    <Link href={`/knowledge-base/${kb._id}`}>
                       <Button variant="outline" size="sm" className="ml-auto">
                         <ExternalLink className="w-4 h-4 mr-2" />
                         View Details
