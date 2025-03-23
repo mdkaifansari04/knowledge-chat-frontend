@@ -1,7 +1,7 @@
 'use client'; // Ensure it's a client component
 
 import LoaderSection from '@/components/loader-section';
-import { accessTokenStorage } from '@/lib/token-interceptor';
+import { accessTokenStorage } from '@/lib/token-storage';
 import { usePathname, useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect, useState } from 'react';
 

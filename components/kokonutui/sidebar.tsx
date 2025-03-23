@@ -2,7 +2,7 @@
 
 import { BarChart2, LogOut, Menu } from 'lucide-react';
 
-import { accessTokenStorage } from '@/lib/token-interceptor';
+import { accessTokenStorage } from '@/lib/token-storage';
 import { Home } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

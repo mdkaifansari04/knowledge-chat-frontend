@@ -10,15 +10,22 @@ class TokenStorage {
   }
 
   set(token: string) {
-    localStorage.setItem(this.storageKey, token);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(this.storageKey, token);
+    }
   }
 
   get() {
-    return localStorage.getItem(this.storageKey);
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(this.storageKey);
+    }
+    return null; // Return null if running on the server
   }
 
   delete() {
-    localStorage.removeItem(this.storageKey);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(this.storageKey);
+    }
   }
 }
 

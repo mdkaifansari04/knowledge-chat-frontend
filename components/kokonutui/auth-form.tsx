@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAdminLogin } from '@/hooks/mutation';
-import { accessTokenStorage } from '@/lib/token-interceptor';
+import { accessTokenStorage } from '@/lib/token-storage';
 import { getErrorMessage } from '@/lib/utils';
 import { Loader2, LockIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';

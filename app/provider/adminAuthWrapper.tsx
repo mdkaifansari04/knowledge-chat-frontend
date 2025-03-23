@@ -2,7 +2,7 @@
 
 import Sidebar from '@/components/kokonutui/sidebar';
 import TopNav from '@/components/kokonutui/top-nav';
-import { accessTokenStorage } from '@/lib/token-interceptor';
+import { accessTokenStorage } from '@/lib/token-storage';
 import { usePathname } from 'next/navigation';
 import { PropsWithChildren, useEffect } from 'react';
 
