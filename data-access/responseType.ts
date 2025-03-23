@@ -1,34 +1,29 @@
-import { User } from '@/store/app';
-
-interface ApiResponse {
+export interface ApiResponse<T = any> {
   success: boolean;
   message: string;
+  data: T;
 }
 
-interface Category {
-  name: string;
-  userId: string;
-  _id: string;
-  __v: number;
-}
-
-export interface CreateCategoryResponse extends ApiResponse {
-  category: Category;
-}
-
-export interface GetCategories extends ApiResponse {
-  categories: Category[];
-}
-
-export interface CreateUserResponse extends ApiResponse {
-  user: User;
+export interface AdminLoginResponse {
   token: string;
 }
 
-export interface AIChatResponse extends ApiResponse {
-  response: string;
-}
-
-export interface UserResponse extends ApiResponse {
-  user: User;
+export interface Analytics {
+  usersCount: number;
+  queries: Array<{
+    timestamp: string;
+    id: string;
+  }>;
+  totalStorageUsed: string;
+  indexes: {
+    name: string;
+    totalVectors: number;
+    dimension: number;
+    namespaces: {
+      [key: string]: {
+        recordCount: number;
+      };
+    };
+    storageUsed: string;
+  }[];
 }

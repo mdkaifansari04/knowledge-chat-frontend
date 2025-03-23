@@ -2,7 +2,7 @@ export const APP_NAME = 'ChatbotMe POC' as const;
 
 export const APP_DESC = 'Chat with your blog with ease' as const;
 
-export const LOCAL_STORAGE_KEY = '@chatbottoken' as const;
+export const LOCAL_STORAGE_KEY = '@knowledgechattoken' as const;
 
 export const PROMPT_CARDS = [
   {

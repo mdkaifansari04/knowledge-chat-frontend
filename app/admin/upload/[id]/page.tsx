@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { FileText, Youtube, Type, FileAudio, FileVideo, Trash2, ChevronDown, ChevronUp, File, Upload, ArrowLeft } from 'lucide-react';
+import { withAdminAuth } from '@/app/provider/adminAuthProvider';
 
 // Sample data from the provided JSON
 const knowledgeBasesData = {
@@ -115,7 +116,7 @@ type KnowledgeBase = {
   __v: number;
 };
 
-export default function KnowledgeBasePage() {
+const KnowledgeBasePage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const [knowledgeBase, setKnowledgeBase] = useState<KnowledgeBase | null>(null);
@@ -534,4 +535,6 @@ export default function KnowledgeBasePage() {
       </div>
     </div>
   );
-}
+};
+
+export default withAdminAuth(KnowledgeBasePage);

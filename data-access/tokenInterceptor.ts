@@ -1,4 +1,4 @@
-import { accessTokenStorage } from '@/lib/utils';
+import { accessTokenStorage } from '@/lib/token-interceptor';
 import type { InternalAxiosRequestConfig } from 'axios';
 
 function tokenInterceptors(config: InternalAxiosRequestConfig) {

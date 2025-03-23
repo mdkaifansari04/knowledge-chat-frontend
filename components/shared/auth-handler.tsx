@@ -1,5 +1,5 @@
 'use client';
-import { accessTokenStorage } from '@/lib/utils';
+import { accessTokenStorage } from '@/lib/token-interceptor';
 import { useAuth } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 

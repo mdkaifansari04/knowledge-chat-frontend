@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Database, Plus, ExternalLink, Calendar, Server, Box, FileText } from 'lucide-react';
+import { withAdminAuth } from '@/app/provider/adminAuthProvider';
 
 // Sample data from the provided JSON
 const knowledgeBasesData = {
@@ -103,7 +104,7 @@ type KnowledgeBase = {
   __v: number;
 };
 
-export default function KnowledgeBaseIndexPage() {
+const Page: React.FC = () => {
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>(knowledgeBasesData.data);
 
   const formatDate = (dateString: string) => {
@@ -215,4 +216,6 @@ export default function KnowledgeBaseIndexPage() {
       </div>
     </div>
   );
-}
+};
+
+export default withAdminAuth(Page);
