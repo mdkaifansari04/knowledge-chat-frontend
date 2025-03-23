@@ -9,7 +9,7 @@ import { Toaster } from 'react-hot-toast';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'ChatbotMe',
+  title: 'Knowledge Chat',
   description: 'A personalized chatbot',
 };
 

@@ -317,7 +317,7 @@ const KnowledgeBasePage: React.FC = () => {
         </header>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-4">
           {/* Resource Display Section */}
           <div className="lg:col-span-2">
             <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Resources</h2>
@@ -385,12 +385,12 @@ const KnowledgeBasePage: React.FC = () => {
           </div>
 
           {/* Upload Section */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2">
             <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Upload Resources</h2>
             <Card>
               <CardContent className="p-4">
                 <Tabs defaultValue="pdf" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-2">
+                  <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
                     <TabsTrigger value="pdf">PDF & Docs</TabsTrigger>
                     <TabsTrigger value="youtube">YouTube</TabsTrigger>
                     <TabsTrigger value="text">Text</TabsTrigger>

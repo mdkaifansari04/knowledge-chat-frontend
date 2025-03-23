@@ -4,6 +4,7 @@ import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import UserProfile from '../shared/user-profile';
 import { ThemeToggle } from '../theme-toggle';
+import { usePathname } from 'next/navigation';
 
 interface BreadcrumbItem {
   label: string;
@@ -11,10 +12,8 @@ interface BreadcrumbItem {
 }
 
 export default function TopNav() {
-  const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'chatbotme', href: '#' },
-    { label: 'dashboard', href: '#' },
-  ];
+  const pathname = usePathname().split('/');
+  const breadcrumbs: BreadcrumbItem[] = pathname.map((i) => ({ label: i }));
 
   return (
     <nav className="px-3 sm:px-6 flex items-center justify-between bg-white dark:bg-[#0F0F12] border-b border-gray-200 dark:border-[#1F1F23] h-full">

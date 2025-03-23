@@ -1,4 +1,4 @@
-export const APP_NAME = 'ChatbotMe POC' as const;
+export const APP_NAME = 'Knowledge Chat' as const;
 
 export const APP_DESC = 'Chat with your blog with ease' as const;
 
