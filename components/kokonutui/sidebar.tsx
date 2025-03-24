@@ -5,23 +5,31 @@ import { BarChart2, LogOut, Menu } from 'lucide-react';
 import { accessTokenStorage } from '@/lib/token-storage';
 import { Home } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Logo from '../shared/logo';
+import { cn } from '@/lib/utils';
 
 export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const path = usePathname().split('/').pop();
   const handleLogout = () => {
     accessTokenStorage.delete();
     router.push('/admin/login');
   };
 
-  function NavItem({ href, icon: Icon, onClick, children }: { href: string; icon: any; children: React.ReactNode; onClick?: () => void }) {
+  function NavItem({ href, icon: Icon, onClick, text }: { href: string; icon: any; text: string; onClick?: () => void }) {
     return (
-      <Link href={href} onClick={onClick} className="flex items-center px-3 py-2 text-sm rounded-md transition-colors text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#1F1F23]">
+      <Link
+        href={href}
+        onClick={onClick}
+        className={cn('flex items-center px-3 py-2 text-sm rounded-md transition-colors text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#1F1F23]', {
+          'text-gray-900 dark:text-white bg-gray-50 dark:bg-[#1F1F23]': path === text.toLowerCase(),
+        })}
+      >
         <Icon className="flex-shrink-0 w-4 h-4 mr-3" />
-        {children}
+        {text}
       </Link>
     );
   }
@@ -64,12 +72,8 @@ export default function Sidebar() {
               <div>
                 <div className="px-3 mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">Overview</div>
                 <div className="space-y-1">
-                  <NavItem href="/admin/dashboard" icon={Home}>
-                    Dashboard
-                  </NavItem>
-                  <NavItem href="/admin/upload" icon={BarChart2}>
-                    Upload
-                  </NavItem>
+                  <NavItem text="Dashboard" href="/admin/dashboard" icon={Home} />
+                  <NavItem text="Upload" href="/admin/upload" icon={BarChart2} />
                 </div>
               </div>
 

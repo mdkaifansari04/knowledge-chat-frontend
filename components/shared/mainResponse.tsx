@@ -21,6 +21,12 @@ interface MainResponseSectionProps {
 
 const QuickActions = [
   {
+    action: 'AppnologyJames',
+    icon: User,
+    gradient: 'from-zinc-900/50 to-black/50',
+    hoverGradient: 'hover:from-zinc-800/50 hover:to-zinc-900/50',
+  },
+  {
     action: 'Market Data',
     icon: LineChart,
     gradient: 'from-zinc-900/50 to-black/50',
@@ -29,12 +35,6 @@ const QuickActions = [
   {
     action: 'Cybersecurity',
     icon: ShieldCheck,
-    gradient: 'from-zinc-900/50 to-black/50',
-    hoverGradient: 'hover:from-zinc-800/50 hover:to-zinc-900/50',
-  },
-  {
-    action: 'AppnologyJames',
-    icon: User,
     gradient: 'from-zinc-900/50 to-black/50',
     hoverGradient: 'hover:from-zinc-800/50 hover:to-zinc-900/50',
   },
@@ -172,7 +172,7 @@ function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
               'resize-none',
               'bg-transparent',
               'border-none',
-              'text-gray-800 dark:text-zinc-100 text-base',
+              'text-gray-800 dark:text-zinc-100 text-sm',
               'focus:outline-none',
               'focus-visible:ring-0 focus-visible:ring-offset-0',
               'placeholder:text-gray-500 dark:placeholder:text-zinc-500 placeholder:text-base',
