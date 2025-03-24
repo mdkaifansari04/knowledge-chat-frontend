@@ -7,10 +7,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { useUploadDocument, useUploadYTVideo } from '@/hooks/mutation';
+import { useUploadDocument, useUploadText, useUploadYTVideo, useMediaUpload } from '@/hooks/mutation';
 import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage, isValidYouTubeUrl } from '@/lib/utils';
-import { FileAudio, FileVideo, Loader, LoaderCircle } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import PrimaryUploadButton from '../action/primary-upload-button';
 
@@ -22,48 +22,15 @@ const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, in
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const [youtubeLink, setYoutubeLink] = useState('');
   const [textContent, setTextContent] = useState('');
-  const [fileName, setFileName] = useState('');
   const [documentUrl, setDocumentUrl] = useState<string | null>(null);
+  const [mediaUrl, setMediaUrl] = useState<string>('');
   const [resourceName, setResourceName] = useState<string>('');
   const { toast } = useToast();
 
   const { mutate: uploadDocument, isPending: isUploadingDocuemnt } = useUploadDocument();
   const { mutate: uploadYtVideo, isPending: isUploadingYtVideos } = useUploadYTVideo();
-
-  const simulateUpload = (type: string) => {
-    const id = `upload-${Date.now()}`;
-    setUploadProgress({ ...uploadProgress, [id]: 0 });
-
-    const interval = setInterval(() => {
-      // setUploadProgress((prev) => {
-      //   const newProgress = Math.min((prev[id] || 0) + 10, 100);
-      //   if (newProgress === 100) {
-      //     clearInterval(interval);
-      //     setTimeout(() => {
-      //       setIsUploading((prev) => ({ ...prev, [id]: false }));
-      //       // Add the new resource
-      //       const newResource: Resource = {
-      //         _id: `new-${Date.now()}`,
-      //         name: fileName || `New ${type} resource`,
-      //         resourceType: type,
-      //         resource: type === 'ytVideo' ? youtubeLink : type === 'text' ? textContent : `https://example.com/${fileName || 'file'}`,
-      //       };
-      //   //     setKnowledgeBase((prev) => {
-      //   //       if (!prev) return prev;
-      //   //       return {
-      //   //         ...prev,
-      //   //         resources: [...prev.resources, newResource],
-      //   //       };
-      //   //     });
-      //   //     setFileName('');
-      //   //     setYoutubeLink('');
-      //   //     setTextContent('');
-      //   //   }, 500);
-      //   // }
-      //   return { ...prev, [id]: newProgress };
-      // });
-    }, 300);
-  };
+  const { mutate: uploadText, isPending: isUploadingText } = useUploadText();
+  const { mutate: uploadMedia, isPending: isUploadingMedia } = useMediaUpload();
 
   const handleUploadDocument = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -95,15 +62,6 @@ const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, in
       },
     );
   };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFileName(file.name);
-      simulateUpload(type);
-    }
-  };
-
   const handleYoutubeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -135,12 +93,58 @@ const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, in
     );
   };
 
-  const handleTextSubmit = (e: React.FormEvent) => {
+  const handleTextUpload = (e: React.MouseEvent) => {
+    e.stopPropagation();
     e.preventDefault();
-    if (textContent) {
-      simulateUpload('text');
-    }
+
+    uploadText(
+      { fileName: resourceName, indexName, knowledgebaseId, text: textContent },
+      {
+        onSuccess: () => {
+          toast({
+            title: 'Resource uploaded successfully',
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: getErrorMessage(error),
+            variant: 'destructive',
+          });
+        },
+        onSettled: () => {
+          setResourceName('');
+          setTextContent('');
+        },
+      },
+    );
   };
+
+  const handleMediaUpload = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    uploadMedia(
+      { fileName: resourceName, indexName, knowledgebaseId, fileUrl: mediaUrl },
+      {
+        onSuccess: () => {
+          toast({
+            title: 'Media uploaded successfully!',
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: getErrorMessage(error),
+            variant: 'destructive',
+          });
+        },
+        onSettled: () => {
+          setResourceName('');
+          setMediaUrl('');
+        },
+      },
+    );
+  };
+
   return (
     <div className="lg:col-span-2">
       <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Upload Resources</h2>
@@ -200,12 +204,12 @@ const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, in
 
             {/* Text Tab */}
             <TabsContent value="text" className="mt-4">
-              <form onSubmit={handleTextSubmit} className="space-y-4">
+              <div className="space-y-4">
                 <div className="flex flex-col space-y-2">
                   <label htmlFor="text-name" className="text-sm font-medium">
                     Resource Name
                   </label>
-                  <Input id="text-name" placeholder="Enter resource name" value={fileName} onChange={(e) => setFileName(e.target.value)} />
+                  <Input id="text-name" placeholder="Enter resource name" value={resourceName} onChange={(e) => setResourceName(e.target.value)} />
                 </div>
 
                 <div className="flex flex-col space-y-2">
@@ -215,10 +219,10 @@ const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, in
                   <Textarea id="text-content" placeholder="Enter your text content here..." className="min-h-[150px]" value={textContent} onChange={(e) => setTextContent(e.target.value)} />
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Add Text Resource
+                <Button onClick={(e) => handleTextUpload(e)} disabled={!resourceName || !textContent || isUploadingText} className="w-full">
+                  {isUploadingText ? <LoaderCircle className="w-5 h-5 animate-spin" /> : 'Add Text Resource'}
                 </Button>
-              </form>
+              </div>
             </TabsContent>
 
             {/* Audio & Video Tab */}
@@ -228,56 +232,20 @@ const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, in
                   <label htmlFor="media-name" className="text-sm font-medium">
                     Resource Name
                   </label>
-                  <Input id="media-name" placeholder="Enter resource name" value={fileName} onChange={(e) => setFileName(e.target.value)} />
+                  <Input id="media-name" placeholder="Enter resource name" value={resourceName} onChange={(e) => setResourceName(e.target.value)} />
                 </div>
 
                 <div className="flex flex-col space-y-2">
                   <label className="text-sm font-medium">Upload Audio or Video</label>
-                  <div className="p-6 text-center transition-colors border-2 border-gray-300 border-dashed rounded-lg cursor-pointer dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <input
-                      type="file"
-                      id="media-upload"
-                      className="hidden"
-                      accept="audio/*,video/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const type = file.type.startsWith('audio/') ? 'audio' : 'video';
-                          handleFileChange(e, type);
-                        }
-                      }}
-                    />
-                    <label htmlFor="media-upload" className="cursor-pointer">
-                      <div className="flex justify-center space-x-4">
-                        <FileAudio className="w-10 h-10 text-gray-400" />
-                        <FileVideo className="w-10 h-10 text-gray-400" />
-                      </div>
-                      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Drag and drop your file here or click to browse</p>
-                      <p className="mt-1 text-xs text-gray-400">Supports MP3, WAV, MP4, MOV (Max 50MB)</p>
-                    </label>
-                  </div>
+                  <PrimaryUploadButton endPoint="mediaUploader" setResourceUrl={setMediaUrl} />
                 </div>
 
-                <Button className="w-full" onClick={() => simulateUpload('media')}>
-                  Upload Media
+                <Button onClick={(e) => handleMediaUpload(e)} disabled={!resourceName || !mediaUrl || isUploadingMedia} className="w-full">
+                  {isUploadingMedia ? <LoaderCircle className="w-5 h-5 animate-spin" /> : 'Upload Media'}
                 </Button>
               </div>
             </TabsContent>
           </Tabs>
-
-          {/* Upload Progress */}
-          {/* {Object.keys(isUploading).map(
-            (id) =>
-              isUploading[id] && (
-                <div key={id} className="mt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Uploading...</span>
-                    <span>{uploadProgress[id]}%</span>
-                  </div>
-                  <Progress value={uploadProgress[id]} className="h-2" />
-                </div>
-              ),
-          )} */}
         </CardContent>
       </Card>
     </div>

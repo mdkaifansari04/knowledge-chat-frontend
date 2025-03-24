@@ -59,7 +59,7 @@ function PrimaryUploadButton({ setResourceUrl, endPoint }: DocumentUploadButtonP
             if (ready)
               return (
                 <span className="relative text-xs py-11 top-3">
-                  Drag & Drop to upload PDF/Docx or&nbsp;
+                  Drag & Drop or&nbsp;
                   <span className="underline text-primary">Choose Files</span>
                 </span>
               );

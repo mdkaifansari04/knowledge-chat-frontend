@@ -27,8 +27,9 @@ export const getKnowledgebaseById = async (id: string) => {
 
 interface TUploadBody {
   fileName: string;
-  fileUrl: string;
+  fileUrl?: string;
   indexName: string;
+  text?: string;
   knowledgebaseId: string;
 }
 
@@ -39,5 +40,15 @@ export const uploadDocument = async (body: TUploadBody) => {
 
 export const uploadYTVideo = async (body: TUploadBody) => {
   const { data } = await adminApi.post<ApiResponse>('/knowledge-base/yt-video/upload', body);
+  return data.data;
+};
+
+export const uploadText = async (body: TUploadBody) => {
+  const { data } = await adminApi.post<ApiResponse>('/knowledge-base/text/upload', body);
+  return data.data;
+};
+
+export const uploadMedia = async (body: TUploadBody) => {
+  const { data } = await adminApi.post<ApiResponse>('/knowledge-base/media/upload', body);
   return data.data;
 };

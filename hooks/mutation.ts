@@ -30,3 +30,16 @@ export function useUploadYTVideo() {
     mutationFn: Admin.uploadYTVideo,
   });
 }
+export function useUploadText() {
+  return useMutation({
+    mutationKey: ['admin-upload-text'],
+    mutationFn: Admin.uploadText,
+  });
+}
+
+export function useMediaUpload() {
+  return useMutation({
+    mutationKey: ['admin-upload-media'],
+    mutationFn: Admin.uploadMedia,
+  });
+}
