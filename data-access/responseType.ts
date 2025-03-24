@@ -27,3 +27,22 @@ export interface Analytics {
     storageUsed: string;
   }[];
 }
+
+interface Resource {
+  _id: string;
+  name: string;
+  resourceType: 'pdf' | 'ytVideo' | 'text' | 'audio' | 'video';
+  resource: string;
+}
+
+export interface KnowledgeBase {
+  _id: string;
+  name: string;
+  dimension: number;
+  metric: string;
+  host: string;
+  resources: Resource[];
+  createdAt: string; // ISO string
+  updatedAt: string; // ISO string
+  __v: number;
+}

@@ -39,3 +39,19 @@ export const getErrorMessage = (error: Error) => {
   const axiosError = error as AxiosError<{ message: string }>;
   return axiosError.response?.data?.message || 'Something went wrong, Please try again';
 };
+
+export const formatDate = (dateString: string) => {
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) throw new Error('Invalid date');
+
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format(date);
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid Date';
+  }
+};

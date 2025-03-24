@@ -28,3 +28,32 @@ export const IndexLoadingView = () => {
     </div>
   );
 };
+
+export const KnowledgebaseLoadingView = () => {
+  return (
+    <div className="grid w-full gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <Skeleton className="h-[250px] rounded-md" />
+      <Skeleton className="h-[250px] rounded-md" />
+      <Skeleton className="h-[250px] rounded-md" />
+    </div>
+  );
+};
+
+export const KnowledgebaseCardLoadingView = () => {
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <Skeleton className="w-[278px] h-[65px] rounded-md" />
+      <Skeleton className="w-[278px] h-[65px] rounded-md" />
+      <Skeleton className="w-[278px] h-[65px] rounded-md" />
+      <Skeleton className="w-[278px] h-[65px] rounded-md" />
+    </div>
+  );
+};
+
+export const ResourceGroupLoadingView = () => {
+  return (
+    <div className="w-full">
+      <Skeleton className="w-full h-[250px] rounded-md" />
+    </div>
+  );
+};
