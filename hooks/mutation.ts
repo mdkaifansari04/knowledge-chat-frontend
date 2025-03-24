@@ -23,3 +23,10 @@ export function useUploadDocument() {
     mutationFn: Admin.uploadDocument,
   });
 }
+
+export function useUploadYTVideo() {
+  return useMutation({
+    mutationKey: ['admin-upload-YT-video'],
+    mutationFn: Admin.uploadYTVideo,
+  });
+}

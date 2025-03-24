@@ -11,7 +11,7 @@ interface DocumentUploadButtonProps {
 }
 
 function PrimaryUploadButton({ setResourceUrl, endPoint }: DocumentUploadButtonProps) {
-  const [loaderProgress, setLoaderProgress] = useState<number | undefined>();
+  const [loaderProgress, setLoaderProgress] = useState<number | undefined>(undefined);
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
   const showProgressbar = loaderProgress !== undefined;
   const { toast } = useToast();

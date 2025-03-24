@@ -25,7 +25,19 @@ export const getKnowledgebaseById = async (id: string) => {
   return data.data;
 };
 
-export const uploadDocument = async (body: { fileName: string; fileUrl: string; indexName: string; knowledgebaseId: string }) => {
-  const { data } = await adminApi.post<ApiResponse>('/document/upload', body);
+interface TUploadBody {
+  fileName: string;
+  fileUrl: string;
+  indexName: string;
+  knowledgebaseId: string;
+}
+
+export const uploadDocument = async (body: TUploadBody) => {
+  const { data } = await adminApi.post<ApiResponse>('/knowledge-base/document/upload', body);
   return data;
+};
+
+export const uploadYTVideo = async (body: TUploadBody) => {
+  const { data } = await adminApi.post<ApiResponse>('/knowledge-base/yt-video/upload', body);
+  return data.data;
 };

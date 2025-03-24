@@ -7,71 +7,31 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { useGetKnowledgebaseById } from '@/hooks/query';
-import { ArrowLeft, File, FileAudio, FileText, FileVideo, Type, Youtube } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
+import { useUploadDocument, useUploadYTVideo } from '@/hooks/mutation';
+import { useToast } from '@/hooks/use-toast';
+import { getErrorMessage, isValidYouTubeUrl } from '@/lib/utils';
+import { FileAudio, FileVideo, Loader, LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import PrimaryUploadButton from '../action/primary-upload-button';
-import { useUploadDocument } from '@/hooks/mutation';
-import { useToast } from '@/hooks/use-toast';
 
 interface ResourceUploaderProps {
   knowledgebaseId: string;
   indexName: string;
 }
 const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, indexName }) => {
-  const params = useParams<{ id: string }>();
-  const router = useRouter();
-  const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
-  const [isUploading, setIsUploading] = useState<{ [key: string]: boolean }>({});
   const [youtubeLink, setYoutubeLink] = useState('');
   const [textContent, setTextContent] = useState('');
   const [fileName, setFileName] = useState('');
   const [documentUrl, setDocumentUrl] = useState<string | null>(null);
-  const [documentName, setDocumentName] = useState<string>('');
+  const [resourceName, setResourceName] = useState<string>('');
   const { toast } = useToast();
 
-  const { data: knowledgeBase, isPending, error, isError } = useGetKnowledgebaseById(params.id as string);
-  const { mutate: uploadDocument } = useUploadDocument();
-  if (!knowledgeBase) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Knowledge Base Not Found</h1>
-          <Button onClick={() => router.push('/')}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Knowledge Bases
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  const getResourceIcon = (resourceType: string) => {
-    switch (resourceType) {
-      case 'pdf':
-        return <FileText className="w-5 h-5" />;
-      case 'ytVideo':
-        return <Youtube className="w-5 h-5" />;
-      case 'text':
-        return <Type className="w-5 h-5" />;
-      case 'audio':
-        return <FileAudio className="w-5 h-5" />;
-      case 'video':
-        return <FileVideo className="w-5 h-5" />;
-      default:
-        return <File className="w-5 h-5" />;
-    }
-  };
-
-  const toggleCard = (id: string) => {
-    setExpandedCard(expandedCard === id ? null : id);
-  };
+  const { mutate: uploadDocument, isPending: isUploadingDocuemnt } = useUploadDocument();
+  const { mutate: uploadYtVideo, isPending: isUploadingYtVideos } = useUploadYTVideo();
 
   const simulateUpload = (type: string) => {
     const id = `upload-${Date.now()}`;
-    setIsUploading({ ...isUploading, [id]: true });
     setUploadProgress({ ...uploadProgress, [id]: 0 });
 
     const interval = setInterval(() => {
@@ -114,7 +74,26 @@ const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, in
         variant: 'destructive',
       });
 
-    uploadDocument({ fileName: documentName, fileUrl: documentUrl!, indexName, knowledgebaseId });
+    uploadDocument(
+      { fileName: resourceName, fileUrl: documentUrl!, indexName, knowledgebaseId },
+      {
+        onSuccess: () => {
+          toast({
+            title: 'Document uploaded successfully',
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: getErrorMessage(error),
+            variant: 'destructive',
+          });
+        },
+        onSettled: () => {
+          setResourceName('');
+          setDocumentUrl(null);
+        },
+      },
+    );
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
@@ -127,9 +106,33 @@ const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, in
 
   const handleYoutubeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (youtubeLink) {
-      simulateUpload('ytVideo');
+    e.stopPropagation();
+    if (!resourceName || !isValidYouTubeUrl(youtubeLink)) {
+      toast({
+        variant: 'destructive',
+        title: 'Please enter valid youtube url',
+      });
     }
+    uploadYtVideo(
+      { fileName: resourceName, fileUrl: youtubeLink, indexName, knowledgebaseId },
+      {
+        onSuccess: () => {
+          toast({
+            title: 'Resource uploaded successfully',
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: getErrorMessage(error),
+            variant: 'destructive',
+          });
+        },
+        onSettled: () => {
+          setResourceName('');
+          setYoutubeLink('');
+        },
+      },
+    );
   };
 
   const handleTextSubmit = (e: React.FormEvent) => {
@@ -158,7 +161,7 @@ const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, in
                   <label htmlFor="pdf-name" className="text-sm font-medium">
                     Resource Name
                   </label>
-                  <Input id="pdf-name" placeholder="Enter resource name" value={documentName} onChange={(e) => setDocumentName(e.target.value)} />
+                  <Input id="pdf-name" placeholder="Enter resource name" value={resourceName} onChange={(e) => setResourceName(e.target.value)} />
                 </div>
 
                 <div className="flex flex-col space-y-2">
@@ -166,20 +169,20 @@ const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, in
                   <PrimaryUploadButton endPoint="documentUploader" setResourceUrl={setDocumentUrl} />
                 </div>
 
-                <Button className="w-full" onClick={(e) => handleUploadDocument(e)}>
-                  Upload Document
+                <Button disabled={!resourceName || !documentUrl || isUploadingDocuemnt} className="w-full" onClick={(e) => handleUploadDocument(e)}>
+                  {isUploadingDocuemnt ? <LoaderCircle className="w-5 h-5 animate-spin" /> : 'Upload Document'}
                 </Button>
               </div>
             </TabsContent>
 
             {/* YouTube Tab */}
             <TabsContent value="youtube" className="mt-4">
-              <form onSubmit={handleYoutubeSubmit} className="space-y-4">
+              <div className="space-y-4">
                 <div className="flex flex-col space-y-2">
                   <label htmlFor="youtube-name" className="text-sm font-medium">
                     Resource Name
                   </label>
-                  <Input id="youtube-name" placeholder="Enter resource name" value={fileName} onChange={(e) => setFileName(e.target.value)} />
+                  <Input id="youtube-name" placeholder="Enter resource name" value={resourceName} onChange={(e) => setResourceName(e.target.value)} />
                 </div>
 
                 <div className="flex flex-col space-y-2">
@@ -189,10 +192,10 @@ const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, in
                   <Input id="youtube-link" placeholder="https://youtube.com/watch?v=..." value={youtubeLink} onChange={(e) => setYoutubeLink(e.target.value)} />
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Add YouTube Video
+                <Button onClick={(e) => handleYoutubeSubmit(e)} disabled={!resourceName || !youtubeLink || isUploadingYtVideos} className="w-full">
+                  {isUploadingYtVideos ? <LoaderCircle className="w-5 h-5 animate-spin" /> : 'Add YouTube Video'}
                 </Button>
-              </form>
+              </div>
             </TabsContent>
 
             {/* Text Tab */}

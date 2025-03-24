@@ -55,3 +55,8 @@ export const formatDate = (dateString: string) => {
     return 'Invalid Date';
   }
 };
+
+export const isValidYouTubeUrl = (url: string): boolean => {
+  const regex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  return regex.test(url);
+};
