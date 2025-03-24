@@ -2,26 +2,25 @@
 import { createUploadthing, type FileRouter } from 'uploadthing/next';
 import { UploadThingError } from 'uploadthing/server';
 
-const f = createUploadthing();
-
-const auth = (req: Request) => ({ id: 'defaultUserId' });
+const uploadthing = createUploadthing();
 
 export const ourFileRouter = {
-  imageUploader: f({ image: { maxFileSize: '4MB' } })
+  documentUploader: uploadthing({ 'application/pdf': { maxFileSize: '16MB' }, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { maxFileSize: '16MB' } })
     .middleware(async ({ req }) => {
-      console.log('test 1 ==========================================================================');
-
-      return { userId: 'demoUserId' };
+      console.log('middleware', req);
+      return { userId: 'demoUserID' };
     })
-    .onUploadComplete(async ({ metadata, file }) => {
-      console.log('test 2 ==========================================================================');
-      console.log('Upload complete for userId:', metadata.userId);
-      console.log(file);
+    .onUploadComplete(({ metadata, file }) => {
+      return { fileUrl: file.ufsUrl };
+    }),
 
-      console.log('file url', file.url);
-
-      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
-      return { imageUrl: file.url, userId: metadata.userId };
+  mediaUploader: uploadthing(['audio/mpeg', 'audio/mp4', 'video/mp4', 'video/mpeg'])
+    .middleware(async ({ req }) => {
+      console.log('middleware', req);
+      return { userId: 'demoUserID' };
+    })
+    .onUploadComplete(({ metadata, file }) => {
+      return { fileUrl: file.ufsUrl };
     }),
 } satisfies FileRouter;
 

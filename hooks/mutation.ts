@@ -16,3 +16,10 @@ export function useAdminLogin() {
     mutationFn: Admin.adminLogin,
   });
 }
+
+export function useUploadDocument() {
+  return useMutation({
+    mutationKey: ['admin-upload-document'],
+    mutationFn: Admin.uploadDocument,
+  });
+}

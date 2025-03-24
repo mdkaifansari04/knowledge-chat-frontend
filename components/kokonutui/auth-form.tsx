@@ -3,14 +3,15 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAdminLogin } from '@/hooks/mutation';
+import { useToast } from '@/hooks/use-toast';
 import { accessTokenStorage } from '@/lib/token-storage';
 import { getErrorMessage } from '@/lib/utils';
 import { Loader2, LockIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
 
 export function AuthForm() {
   const { mutate: login, isPending: isLoading } = useAdminLogin();
+  const { toast } = useToast();
   const router = useRouter();
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,12 +24,14 @@ export function AuthForm() {
       { username, password },
       {
         onSuccess: (response) => {
-          toast.success('Login successfully.');
           accessTokenStorage.set(response.token);
           router.push('/admin/dashboard');
         },
         onError: (error: Error) => {
-          toast.error(getErrorMessage(error));
+          toast({
+            variant: 'destructive',
+            title: getErrorMessage(error),
+          });
         },
       },
     );

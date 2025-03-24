@@ -203,7 +203,7 @@ const KnowledgeBasePage: React.FC = () => {
           </div>
 
           {/* Upload Section */}
-          <ResourceUploader knowledgebaseId={params.id} />
+          <ResourceUploader indexName={knowledgeBase.name} knowledgebaseId={params.id} />
         </div>
       </div>
     </div>

@@ -24,3 +24,8 @@ export const getKnowledgebaseById = async (id: string) => {
   const { data } = await adminApi.get<ApiResponse<KnowledgeBase>>(`/knowledge-base/${id}`);
   return data.data;
 };
+
+export const uploadDocument = async (body: { fileName: string; fileUrl: string; indexName: string; knowledgebaseId: string }) => {
+  const { data } = await adminApi.post<ApiResponse>('/document/upload', body);
+  return data;
+};

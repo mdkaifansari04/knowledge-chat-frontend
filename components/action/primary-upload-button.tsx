@@ -1,32 +1,40 @@
 'use client';
-import { FadeImg } from '@/components/ui/fade-image';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
 import { UploadButton } from '@/lib/uploadthing';
+import { FileTextIcon } from 'lucide-react';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 
-interface PrimaryUploadButtonProps {
-  setProblemImage: (value: string) => void;
+interface DocumentUploadButtonProps {
+  setResourceUrl: (value: string) => void;
+  endPoint: 'documentUploader' | 'mediaUploader';
 }
 
-function PrimaryUploadButton({ setProblemImage }: PrimaryUploadButtonProps) {
+function PrimaryUploadButton({ setResourceUrl, endPoint }: DocumentUploadButtonProps) {
   const [loaderProgress, setLoaderProgress] = useState<number | undefined>();
+  const [uploadedFile, setUploadedFile] = useState<string | null>(null);
   const showProgressbar = loaderProgress !== undefined;
-
+  const { toast } = useToast();
   return (
     <div className="relative w-full">
-      <FadeImg src="/images/upload-docs.svg" className="absolute top-2 left-[45%] z-20" />
+      <FileTextIcon className=" absolute top-5 left-[45%] z-20 w-10 h-10 mx-auto text-gray-400" />
       <UploadButton
         onUploadProgress={(progress) => {
           setLoaderProgress(progress);
         }}
-        endpoint="imageUploader"
-        className="relative w-full z-10 !text-black border  border-dashed rounded-xs ut-button:bg-red-500 cursor-pointer bg-background"
+        endpoint={endPoint}
+        className="p-6 text-center transition-colors border-2 border-gray-300 border-dashed rounded-lg cursor-pointer dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50"
         onClientUploadComplete={(response) => {
-          setProblemImage(response[0].appUrl);
+          setResourceUrl(response[0].ufsUrl);
+          setUploadedFile(response[0].name);
+          setLoaderProgress(undefined);
         }}
         onUploadError={(error) => {
-          toast.error('Something went wrong!');
+          toast({
+            variant: 'destructive',
+            title: 'Uh oh! Something went wrong.',
+            description: 'There was a problem while uploading, Try again.',
+          });
           console.log('Error', error);
         }}
         appearance={{
@@ -51,15 +59,16 @@ function PrimaryUploadButton({ setProblemImage }: PrimaryUploadButtonProps) {
             if (ready)
               return (
                 <span className="relative text-xs py-11 top-3">
-                  Drag & Drop to upload photo or&nbsp;
+                  Drag & Drop to upload PDF/Docx or&nbsp;
                   <span className="underline text-primary">Choose Files</span>
                 </span>
               );
-            return <span className="relative z-30 text-xs text-primary-foreground top-3 py-7">Getting ready ...</span>;
+            return <span className="relative z-30 text-xs text-black dark:text-slate-400 text-primary-foreground top-3 py-7">Getting ready ...</span>;
           },
         }}
       />
       {showProgressbar && <Progress className="absolute bg-primary bottom-4 w-[60%] h-1 z-20 left-[20%]" value={loaderProgress} />}
+      {uploadedFile && <span className="absolute text-xs text-center uppercase bottom-7 w-[60%] h-1 z-20 left-[20%]">{uploadedFile}</span>}
     </div>
   );
 }

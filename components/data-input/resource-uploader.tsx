@@ -11,9 +11,15 @@ import { useGetKnowledgebaseById } from '@/hooks/query';
 import { ArrowLeft, File, FileAudio, FileText, FileVideo, Type, Youtube } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import PrimaryUploadButton from '../action/primary-upload-button';
+import { useUploadDocument } from '@/hooks/mutation';
+import { useToast } from '@/hooks/use-toast';
 
-// Sample data from the provided JSON
-const ResourceUploader: React.FC<{ knowledgebaseId: string }> = ({ knowledgebaseId }) => {
+interface ResourceUploaderProps {
+  knowledgebaseId: string;
+  indexName: string;
+}
+const ResourceUploader: React.FC<ResourceUploaderProps> = ({ knowledgebaseId, indexName }) => {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
@@ -22,10 +28,12 @@ const ResourceUploader: React.FC<{ knowledgebaseId: string }> = ({ knowledgebase
   const [youtubeLink, setYoutubeLink] = useState('');
   const [textContent, setTextContent] = useState('');
   const [fileName, setFileName] = useState('');
+  const [documentUrl, setDocumentUrl] = useState<string | null>(null);
+  const [documentName, setDocumentName] = useState<string>('');
+  const { toast } = useToast();
 
   const { data: knowledgeBase, isPending, error, isError } = useGetKnowledgebaseById(params.id as string);
-  console.log(knowledgeBase);
-
+  const { mutate: uploadDocument } = useUploadDocument();
   if (!knowledgeBase) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -61,8 +69,6 @@ const ResourceUploader: React.FC<{ knowledgebaseId: string }> = ({ knowledgebase
     setExpandedCard(expandedCard === id ? null : id);
   };
 
-  const handleDelete = (id: string) => {};
-
   const simulateUpload = (type: string) => {
     const id = `upload-${Date.now()}`;
     setIsUploading({ ...isUploading, [id]: true });
@@ -97,6 +103,18 @@ const ResourceUploader: React.FC<{ knowledgebaseId: string }> = ({ knowledgebase
       //   return { ...prev, [id]: newProgress };
       // });
     }, 300);
+  };
+
+  const handleUploadDocument = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!documentUrl)
+      return toast({
+        title: 'Please upload the document',
+        variant: 'destructive',
+      });
+
+    uploadDocument({ fileName: documentName, fileUrl: documentUrl!, indexName, knowledgebaseId });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
@@ -140,22 +158,15 @@ const ResourceUploader: React.FC<{ knowledgebaseId: string }> = ({ knowledgebase
                   <label htmlFor="pdf-name" className="text-sm font-medium">
                     Resource Name
                   </label>
-                  <Input id="pdf-name" placeholder="Enter resource name" value={fileName} onChange={(e) => setFileName(e.target.value)} />
+                  <Input id="pdf-name" placeholder="Enter resource name" value={documentName} onChange={(e) => setDocumentName(e.target.value)} />
                 </div>
 
                 <div className="flex flex-col space-y-2">
                   <label className="text-sm font-medium">Upload PDF or Document</label>
-                  <div className="p-6 text-center transition-colors border-2 border-gray-300 border-dashed rounded-lg cursor-pointer dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <input type="file" id="pdf-upload" className="hidden" accept=".pdf,.doc,.docx" onChange={(e) => handleFileChange(e, 'pdf')} />
-                    <label htmlFor="pdf-upload" className="cursor-pointer">
-                      <FileText className="w-10 h-10 mx-auto text-gray-400" />
-                      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Drag and drop your file here or click to browse</p>
-                      <p className="mt-1 text-xs text-gray-400">Supports PDF, DOC, DOCX (Max 10MB)</p>
-                    </label>
-                  </div>
+                  <PrimaryUploadButton endPoint="documentUploader" setResourceUrl={setDocumentUrl} />
                 </div>
 
-                <Button className="w-full" onClick={() => simulateUpload('pdf')}>
+                <Button className="w-full" onClick={(e) => handleUploadDocument(e)}>
                   Upload Document
                 </Button>
               </div>

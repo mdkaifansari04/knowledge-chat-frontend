@@ -4,31 +4,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useChatWithBlog } from '@/hooks/mutation';
-import { cn, getUserShortName } from '@/lib/utils';
+import { cn, getErrorMessage, getUserShortName } from '@/lib/utils';
 import useChatStore from '@/store/chat';
 import { motion } from 'framer-motion';
-import {
-  Check,
-  CirclePause,
-  Copy,
-  LineChart,
-  SendIcon,
-  ShieldCheck,
-  User,
-  Volume2,
-} from 'lucide-react';
+import { Check, CirclePause, Copy, LineChart, SendIcon, ShieldCheck, User, Volume2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Fragment, useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
 import Markdown from 'react-markdown';
 import '../../app/globals.css';
+import { useToast } from '@/hooks/use-toast';
 interface MainResponseSectionProps {
   isDivisionOption: boolean;
 }
@@ -54,9 +40,7 @@ const QuickActions = [
   },
 ];
 
-export default function MainResponseSection({
-  isDivisionOption,
-}: MainResponseSectionProps) {
+export default function MainResponseSection({ isDivisionOption }: MainResponseSectionProps) {
   const { chat, resetChat, streamText, resetStream } = useChatStore();
   const messageEndRef = useRef<HTMLDivElement | null>(null);
   const showEmptyActivity = chat.length === 0;
@@ -79,20 +63,9 @@ export default function MainResponseSection({
         >
           <div className="pb-10 mb-4 space-y-3 pt-14 hide-scrollbar">
             {chat.map((i, k) => (
-              <ChatMessage
-                key={k}
-                type={i.sender}
-                userName={i.sender === 'user' ? 'You' : 'AI Model'}
-                message={i.message}
-              />
+              <ChatMessage key={k} type={i.sender} userName={i.sender === 'user' ? 'You' : 'AI Model'} message={i.message} />
             ))}
-            {streamText.length !== 0 ? (
-              <ChatMessage
-                type="model"
-                userName="AI Model"
-                message={streamText!}
-              />
-            ) : null}
+            {streamText.length !== 0 ? <ChatMessage type="model" userName="AI Model" message={streamText!} /> : null}
 
             {showEmptyActivity && <EmptyActivity />}
             <div ref={messageEndRef} />
@@ -106,21 +79,9 @@ export default function MainResponseSection({
 
 function EmptyActivity() {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.7 }}
-      className={cn(
-        'relative z-30 pt-32 text-center pb-20',
-        'opacity-100 scale-100',
-      )}
-    >
-      <h1 className="relative z-30 mb-4 text-5xl font-medium tracking-tighter text-black md:text-6xl bg-clip-text bg-gradient-to-b from-gray-800 to-gray-600 dark:text-white dark:bg-gradient-to-b dark:from-black dark:to-black/70">
-        Welcome to Knowledge Chat
-      </h1>
-      <p className="relative z-30 text-xl text-gray-600 dark:text-zinc-400">
-        What can I do for you today?
-      </p>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }} className={cn('relative z-30 pt-32 text-center pb-20', 'opacity-100 scale-100')}>
+      <h1 className="relative z-30 mb-4 text-5xl font-medium tracking-tighter text-black md:text-6xl bg-clip-text bg-gradient-to-b from-gray-800 to-gray-600 dark:text-white dark:bg-gradient-to-b dark:from-black dark:to-black/70">Welcome to Knowledge Chat</h1>
+      <p className="relative z-30 text-xl text-gray-600 dark:text-zinc-400">What can I do for you today?</p>
     </motion.div>
   );
 }
@@ -138,9 +99,9 @@ type PromptInputBoxProps = MainResponseSectionProps;
 
 function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
   const [prompt, setPrompt] = useState('');
+  const { toast } = useToast();
   const ChatStore = useChatStore();
-  const { mutate: requestChatWithPdf, isPending: isProcessing } =
-    useChatWithBlog();
+  const { mutate: requestChatWithPdf, isPending: isProcessing } = useChatWithBlog();
 
   const handleStream = async (response: Response) => {
     const reader = response.body?.getReader();
@@ -161,7 +122,11 @@ function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
         ChatStore.setStreamText(chunk);
       }
     } else {
-      toast('Something went wrong, try again');
+      toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'There was a problem with your request, Try again',
+      });
     }
   };
 
@@ -180,10 +145,10 @@ function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
           handleStream(response);
         },
         onError: (error) => {
-          if (error.message) {
-            return toast.error(error.message);
-          }
-          toast.error('Something went wrong');
+          toast({
+            variant: 'destructive',
+            title: getErrorMessage(error),
+          });
         },
       },
     );
@@ -216,11 +181,7 @@ function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
           />
           <div className="flex items-center justify-end p-3">
             <Button
-              className={cn(
-                'px-1.5 py-1.5 h-6 rounded-lg text-sm transition-colors hover:bg-gray-200 dark:hover:bg-zinc-800 flex items-center justify-between gap-1',
-                'text-gray-800 dark:text-zinc-100',
-                'disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-zinc-900',
-              )}
+              className={cn('px-1.5 py-1.5 h-6 rounded-lg text-sm transition-colors hover:bg-gray-200 dark:hover:bg-zinc-800 flex items-center justify-between gap-1', 'text-gray-800 dark:text-zinc-100', 'disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-zinc-900')}
               disabled={prompt.length === 0}
               onClick={() => {
                 console.log('Sending message:', prompt);
@@ -264,14 +225,9 @@ function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
                 >
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 rounded-md bg-gray-200 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700">
-                      <Icon
-                        size={14}
-                        className="text-gray-800 dark:text-zinc-100"
-                      />
+                      <Icon size={14} className="text-gray-800 dark:text-zinc-100" />
                     </div>
-                    <div className="text-xs font-medium text-gray-800 dark:text-zinc-100">
-                      {item.action}
-                    </div>
+                    <div className="text-xs font-medium text-gray-800 dark:text-zinc-100">{item.action}</div>
                   </div>
                 </button>
               </motion.div>
@@ -283,36 +239,18 @@ function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
   );
 }
 
-function ChatMessage(props: {
-  userName: string | undefined;
-  message: string;
-  type: 'model' | 'user';
-}) {
+function ChatMessage(props: { userName: string | undefined; message: string; type: 'model' | 'user' }) {
   return (
     <div className="flex items-start gap-4">
-      <Avatar
-        className={cn('w-8 h-8 border', { 'p-1': props.type === 'model' })}
-      >
-        <AvatarImage
-          src={
-            props.type === 'user'
-              ? '/images/placeholder-user.jpg'
-              : '/images/ai-profile.svg'
-          }
-        />
+      <Avatar className={cn('w-8 h-8 border', { 'p-1': props.type === 'model' })}>
+        <AvatarImage src={props.type === 'user' ? '/images/placeholder-user.jpg' : '/images/ai-profile.svg'} />
         <AvatarFallback>{getUserShortName(props.userName)}</AvatarFallback>
       </Avatar>
       <div className="grid items-start gap-1 text-sm">
         <div className="flex items-center gap-2">
           <div className="font-medium">{props.userName}</div>
         </div>
-        <div>
-          {props.type === 'user' ? (
-            <p>{props.message}</p>
-          ) : (
-            <Markdown>{props.message}</Markdown>
-          )}
-        </div>
+        <div>{props.type === 'user' ? <p>{props.message}</p> : <Markdown>{props.message}</Markdown>}</div>
         <div className="flex gap-1">
           {props.type === 'model' && <CopyToClipboard text={props.message} />}
           {props.type === 'model' && <ReadAloud text={props.message} />}
@@ -338,10 +276,7 @@ function CopyToClipboard({ text }: { text: string }) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span
-            className="flex items-center justify-center w-6 rounded-md cursor-pointer text-slate-500 group hover:bg-muted"
-            onClick={handleCopy}
-          >
+          <span className="flex items-center justify-center w-6 rounded-md cursor-pointer text-slate-500 group hover:bg-muted" onClick={handleCopy}>
             {copied ? <Check className="w-3" /> : <Copy className="w-3" />}
           </span>
         </TooltipTrigger>
@@ -375,15 +310,8 @@ function ReadAloud({ text }: { text: string }) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span
-            className="flex items-center justify-center w-6 rounded-md cursor-pointer text-slate-500 group hover:bg-muted"
-            onClick={handleReadAloud}
-          >
-            {isReading ? (
-              <CirclePause className="w-3" />
-            ) : (
-              <Volume2 className="w-3" />
-            )}
+          <span className="flex items-center justify-center w-6 rounded-md cursor-pointer text-slate-500 group hover:bg-muted" onClick={handleReadAloud}>
+            {isReading ? <CirclePause className="w-3" /> : <Volume2 className="w-3" />}
           </span>
         </TooltipTrigger>
         <TooltipContent sideOffset={1}>
