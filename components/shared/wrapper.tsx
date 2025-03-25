@@ -34,7 +34,7 @@ export default function QueryWrapper(props: QueryWrapperProps) {
 
 function DefaultLoader() {
   return (
-    <div className="w-full flex justify-center items-center">
+    <div className="flex items-center justify-center w-full">
       <Loader2 className="w-3 h-3 animate-spin" />
     </div>
   );
@@ -42,24 +42,13 @@ function DefaultLoader() {
 
 function QueryErrorIndicator(props: { errorMessage?: string }) {
   return (
-    <div className="w-full text-red-600 flex flex-col gap-3">
+    <div className="flex flex-col items-center justify-center w-full gap-3 text-red-600">
       <TriangleAlertIcon className="w-10 h-10" />
-      <p className="font-normal text-sm tracking-tighter">
-        {props.errorMessage ? props.errorMessage : 'Something went wrong'}
-      </p>
+      <p className="text-sm font-normal tracking-tighter">{props.errorMessage ? props.errorMessage : 'Something went wrong'}</p>
     </div>
   );
 }
 
-export function MainSectionWrapper(props: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <main
-      className={cn('w-full h-screen p-4 overflow-y-auto', props.className)}
-    >
-      {props.children}
-    </main>
-  );
+export function MainSectionWrapper(props: { children: React.ReactNode; className?: string }) {
+  return <main className={cn('w-full h-screen p-4 overflow-y-auto', props.className)}>{props.children}</main>;
 }
