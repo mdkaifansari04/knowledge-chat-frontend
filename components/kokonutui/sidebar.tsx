@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
-  const path = usePathname().split('/').pop();
+  const paths = usePathname().split('/');
   const handleLogout = () => {
     accessTokenStorage.delete();
     router.push('/admin/login');
@@ -25,7 +25,7 @@ export default function Sidebar() {
         href={href}
         onClick={onClick}
         className={cn('flex items-center px-3 py-2 text-sm rounded-md transition-colors text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#1F1F23]', {
-          'text-gray-900 dark:text-white bg-gray-50 dark:bg-[#1F1F23]': path === text.toLowerCase(),
+          'text-gray-900 dark:text-white bg-gray-50 dark:bg-[#1F1F23]': paths.includes(text.toLowerCase()),
         })}
       >
         <Icon className="flex-shrink-0 w-4 h-4 mr-3" />

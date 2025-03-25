@@ -4,17 +4,19 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Textarea } from '@/components/ui/textarea';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useChatWithBlog } from '@/hooks/mutation';
+import { useToast } from '@/hooks/use-toast';
 import { cn, getErrorMessage, getUserShortName } from '@/lib/utils';
 import useChatStore from '@/store/chat';
 import { motion } from 'framer-motion';
-import { Check, CirclePause, Copy, LineChart, SendIcon, ShieldCheck, User, Volume2 } from 'lucide-react';
+import { LineChart, SendIcon, ShieldCheck, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import '../../app/globals.css';
-import { useToast } from '@/hooks/use-toast';
+import { CopyToClipboard } from '../action/copy-to-clipboard';
+import { ReadAloud } from '../action/read-aloud';
+
 interface MainResponseSectionProps {
   isDivisionOption: boolean;
 }
@@ -257,67 +259,5 @@ function ChatMessage(props: { userName: string | undefined; message: string; typ
         </div>
       </div>
     </div>
-  );
-}
-
-function CopyToClipboard({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
-    });
-  };
-
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="flex items-center justify-center w-6 rounded-md cursor-pointer text-slate-500 group hover:bg-muted" onClick={handleCopy}>
-            {copied ? <Check className="w-3" /> : <Copy className="w-3" />}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent sideOffset={1}>
-          <p>{copied ? 'Copied' : 'Copy'}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-}
-
-function ReadAloud({ text }: { text: string }) {
-  const [isReading, setIsReading] = useState(false);
-  let utterance: SpeechSynthesisUtterance;
-
-  const handleReadAloud = () => {
-    if (isReading) {
-      speechSynthesis.cancel();
-      setIsReading(false);
-      return;
-    }
-    utterance = new SpeechSynthesisUtterance(text);
-    setIsReading(true);
-    utterance.onend = () => {
-      setIsReading(false);
-    };
-    speechSynthesis.speak(utterance);
-  };
-
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="flex items-center justify-center w-6 rounded-md cursor-pointer text-slate-500 group hover:bg-muted" onClick={handleReadAloud}>
-            {isReading ? <CirclePause className="w-3" /> : <Volume2 className="w-3" />}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent sideOffset={1}>
-          <p>{isReading ? 'Stop' : 'Read Aloud'}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
   );
 }
