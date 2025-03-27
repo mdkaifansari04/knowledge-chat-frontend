@@ -2,48 +2,32 @@
 import { Loader } from '@/components/shared/loader';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import Icon from '@/components/ui/icon';
 import { Textarea } from '@/components/ui/textarea';
-import { useChatWithBlog } from '@/hooks/mutation';
+import { useChatWithKnowledgebase } from '@/hooks/mutation';
+import { useGetKnowledgebase } from '@/hooks/query';
 import { useToast } from '@/hooks/use-toast';
 import { cn, getErrorMessage, getUserShortName } from '@/lib/utils';
 import useChatStore from '@/store/chat';
 import { motion } from 'framer-motion';
 import { LineChart, SendIcon, ShieldCheck, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import '../../app/globals.css';
 import { CopyToClipboard } from '../action/copy-to-clipboard';
 import { ReadAloud } from '../action/read-aloud';
+import { PromptCardLoadingView } from '../loading-view';
+import QueryWrapper from './wrapper';
 
 interface MainResponseSectionProps {
   isDivisionOption: boolean;
 }
 
-const QuickActions = [
-  {
-    action: 'AppnologyJames',
-    icon: User,
-    gradient: 'from-zinc-900/50 to-black/50',
-    hoverGradient: 'hover:from-zinc-800/50 hover:to-zinc-900/50',
-  },
-  {
-    action: 'Market Data',
-    icon: LineChart,
-    gradient: 'from-zinc-900/50 to-black/50',
-    hoverGradient: 'hover:from-zinc-800/50 hover:to-zinc-900/50',
-  },
-  {
-    action: 'Cybersecurity',
-    icon: ShieldCheck,
-    gradient: 'from-zinc-900/50 to-black/50',
-    hoverGradient: 'hover:from-zinc-800/50 hover:to-zinc-900/50',
-  },
-];
+const QuickActions = [User, ShieldCheck, LineChart];
 
 export default function MainResponseSection({ isDivisionOption }: MainResponseSectionProps) {
   const { chat, resetChat, streamText, resetStream } = useChatStore();
+
   const messageEndRef = useRef<HTMLDivElement | null>(null);
   const showEmptyActivity = chat.length === 0;
   const router = useRouter();
@@ -88,22 +72,15 @@ function EmptyActivity() {
   );
 }
 
-const PromptCard = (props: { prompt: string; icon: string }) => {
-  return (
-    <div className="p-3 border rounded-lg cursor-pointer">
-      <Icon src={props.icon} />
-      <p className="mt-4 text-xs font-normal">{props.prompt}</p>
-    </div>
-  );
-};
-
 type PromptInputBoxProps = MainResponseSectionProps;
 
-function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
+const PromptInputBox = ({ isDivisionOption }: PromptInputBoxProps) => {
   const [prompt, setPrompt] = useState('');
+  const [knowledgebase, setKnowledgebase] = useState<string | null>(null);
   const { toast } = useToast();
   const ChatStore = useChatStore();
-  const { mutate: requestChatWithPdf, isPending: isProcessing } = useChatWithBlog();
+  const { mutate: chatwithKnowledgebase, isPending: isProcessing } = useChatWithKnowledgebase();
+  const { data: knowledgebases, isError, error, isPending } = useGetKnowledgebase();
 
   const handleStream = async (response: Response) => {
     const reader = response.body?.getReader();
@@ -136,11 +113,17 @@ function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
     e.preventDefault();
     e.stopPropagation();
     if (prompt.length === 0) return;
+    if (!knowledgebase)
+      return toast({
+        title: 'Please select a knowledgebase',
+        variant: 'destructive',
+      });
     setPrompt('');
     ChatStore.setChat({ sender: 'user', message: prompt });
-    requestChatWithPdf(
+    chatwithKnowledgebase(
       {
         userPrompt: prompt,
+        indexName: knowledgebase!,
       },
       {
         onSuccess: (response) => {
@@ -185,9 +168,7 @@ function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
             <Button
               className={cn('px-1.5 py-1.5 h-6 rounded-lg text-sm transition-colors hover:bg-gray-200 dark:hover:bg-zinc-800 flex items-center justify-between gap-1', 'text-gray-800 dark:text-zinc-100', 'disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-zinc-900')}
               disabled={prompt.length === 0}
-              onClick={() => {
-                console.log('Sending message:', prompt);
-              }}
+              onClick={(e) => handleSubmit(e)}
             >
               {isProcessing ? (
                 <Loader className="w-3 h-3" />
@@ -200,46 +181,70 @@ function PromptInputBox({ isDivisionOption }: PromptInputBoxProps) {
             </Button>
           </div>
         </div>
-
-        <div className="grid w-full gap-2 sm:grid-cols-3">
-          {QuickActions.map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{
-                  delay: 0.1 * index,
-                  duration: 0.4,
-                  ease: 'easeOut',
-                }}
-                key={index}
-                className={`${index > 1 ? 'hidden sm:block' : 'block'} h-full`}
-              >
-                <button
-                  type="button"
-                  className="group w-full h-full text-left rounded-lg p-2.5
-                                    bg-white dark:bg-zinc-900 hover:bg-gray-200 dark:hover:bg-zinc-800
-                                    border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700
-                                    transition-colors duration-300
-                                    flex flex-col justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-md bg-gray-200 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700">
-                      <Icon size={14} className="text-gray-800 dark:text-zinc-100" />
-                    </div>
-                    <div className="text-xs font-medium text-gray-800 dark:text-zinc-100">{item.action}</div>
-                  </div>
-                </button>
-              </motion.div>
-            );
-          })}
-        </div>
+        <QueryWrapper
+          data={knowledgebases}
+          isError={isError}
+          error={error}
+          isPending={isPending}
+          pendingView={<PromptCardLoadingView />}
+          view={
+            <div className="grid w-full gap-2 sm:grid-cols-3">
+              {knowledgebases &&
+                knowledgebases.map((item, index) => {
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 20 }}
+                      transition={{
+                        delay: 0.1 * index,
+                        duration: 0.4,
+                        ease: 'easeOut',
+                      }}
+                      key={`knowledgebase-card-${index}`}
+                      className={`${index > 1 ? 'hidden sm:block' : 'block'} h-full`}
+                    >
+                      <PromptCard index={index} name={item.name} knowledgebase={knowledgebase} setKnowledgebase={setKnowledgebase} />
+                    </motion.div>
+                  );
+                })}
+            </div>
+          }
+        />
       </div>
     </div>
   );
-}
+};
+
+const PromptCard = (props: { name: string; setKnowledgebase: (value: string) => void; index: number; knowledgebase: string | null }) => {
+  const Icon = QuickActions[props.index % QuickActions.length];
+  const selected = typeof props.knowledgebase === 'string' && props.knowledgebase === props.name ? true : false;
+  console.log('sel', props.knowledgebase, selected);
+
+  return (
+    <button
+      type="button"
+      onClick={() => props.setKnowledgebase(props.name)}
+      className={cn(
+        `group w-full h-full text-left rounded-lg p-2.5
+            bg-white dark:bg-zinc-900 hover:bg-gray-200 dark:hover:bg-zinc-800
+            border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700
+            transition-colors duration-300
+            flex flex-col justify-between`,
+        {
+          '!border-blue-300 !bg-blue-100/50 dark:!border-blue-500 dark:!bg-blue-900/50': selected,
+        },
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <div className="p-1.5 rounded-md bg-gray-200 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700">
+          <Icon size={14} className="text-gray-800 dark:text-zinc-100" />
+        </div>
+        <div className="text-xs font-medium text-gray-800 capitalize dark:text-zinc-100">{props.name}</div>
+      </div>
+    </button>
+  );
+};
 
 function ChatMessage(props: { userName: string | undefined; message: string; type: 'model' | 'user' }) {
   return (

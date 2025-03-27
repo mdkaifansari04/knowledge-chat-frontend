@@ -3,10 +3,10 @@ import * as AIModel from '@/data-access/aiModel';
 
 import { useMutation } from '@tanstack/react-query';
 
-export function useChatWithBlog() {
+export function useChatWithKnowledgebase() {
   return useMutation({
-    mutationKey: ['chat-with-blogs'],
-    mutationFn: AIModel.chatWithBlog,
+    mutationKey: ['chat-with-knowledgebase'],
+    mutationFn: AIModel.chatWithKnowledgebase,
   });
 }
 
