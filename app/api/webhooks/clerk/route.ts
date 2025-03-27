@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server';
 const userApi = axios.create({ baseURL: process.env.NEXT_PUBLIC_HOST_URL });
 
 export async function POST(req: Request) {
-  const SIGNING_SECRET = process.env.SIGNING_SECRET;
+  const SIGNING_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
   if (!SIGNING_SECRET) {
     throw new Error('Error: Please add SIGNING_SECRET from Clerk Dashboard to .env or .env.local');
@@ -57,30 +57,34 @@ export async function POST(req: Request) {
   const eventType = evt.type;
 
   if (eventType === 'user.created') {
-    const { first_name, last_name, email_addresses, id } = evt.data;
-    console.log(first_name, last_name, email_addresses, id);
+    try {
+      const { first_name, last_name, email_addresses, id } = evt.data;
+      console.log(first_name, last_name, email_addresses, id);
 
-    const { data } = await userApi.post('/user', {
-      name: first_name + ' ' + last_name,
-      email: email_addresses[0].email_address,
-      clerkId: id,
-    });
-
-    console.log('user', data);
-
-    if (data?.user) {
-      const client = await clerkClient();
-      client.users.updateUserMetadata(id, {
-        publicMetadata: {
-          userId: data.user?._id,
-        },
+      const { data } = await userApi.post('/users', {
+        name: first_name + ' ' + last_name,
+        email: email_addresses[0].email_address,
+        clerkId: id,
       });
-    }
 
-    return NextResponse.json({
-      message: 'User created successfully',
-      user: data.user,
-    });
+      console.log('user', data);
+
+      if (data?.user) {
+        const client = await clerkClient();
+        client.users.updateUserMetadata(id, {
+          publicMetadata: {
+            userId: data.user?._id,
+          },
+        });
+      }
+
+      return NextResponse.json({
+        message: 'User created successfully',
+        user: data.user,
+      });
+    } catch (error) {
+      console.log('Backend error', error);
+    }
   }
 
   console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
