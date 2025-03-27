@@ -21,57 +21,31 @@ const Page: React.FC = () => {
         </div>
         {/* Stats Cards */}
         <QueryWrapper isError={isError} data={data} error={error} isPending={isPending} pendingView={<StatsCardLoadingView />} view={<StatsCards data={data!} />} />
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="overview">
-              <LineChart className="w-4 h-4 mr-2" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="analytics">
-              <BarChart className="w-4 h-4 mr-2" />
-              Analytics
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-4">
-            {/* Queries Chart */}
-            <QueryWrapper
-              isError={isError}
-              data={data}
-              error={error}
-              isPending={isPending}
-              pendingView={<QueryChartLoadingView />}
-              view={
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Queries Per Day</CardTitle>
-                    <CardDescription>The number of queries made each day</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pl-2">
-                    <QueriesChart queries={data ? data.queries : []} />
-                  </CardContent>
-                </Card>
-              }
-            />
-            {/* Indexes Grid */}
-            <div>
-              <h3 className="mb-4 text-lg font-medium">Indexes</h3>
-              <QueryWrapper isError={isError} data={data} error={error} isPending={isPending} pendingView={<IndexLoadingView />} view={<IndexesGrid indexes={data?.indexes!} />} />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Advanced Analytics</CardTitle>
-                <CardDescription>Detailed analytics about system usage</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Advanced analytics features will be available soon.</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        <div>
+          <QueryWrapper
+            isError={isError}
+            data={data}
+            error={error}
+            isPending={isPending}
+            pendingView={<QueryChartLoadingView />}
+            view={
+              <Card>
+                <CardHeader>
+                  <CardTitle>Queries Per Day</CardTitle>
+                  <CardDescription>The number of queries made each day</CardDescription>
+                </CardHeader>
+                <CardContent className="pl-2">
+                  <QueriesChart queries={data ? data.queries : []} />
+                </CardContent>
+              </Card>
+            }
+          />
+          {/* Indexes Grid */}
+          <div>
+            <h3 className="my-4 text-xl font-medium">Indexes</h3>
+            <QueryWrapper isError={isError} data={data} error={error} isPending={isPending} pendingView={<IndexLoadingView />} view={<IndexesGrid indexes={data?.indexes!} />} />
+          </div>
+        </div>
       </div>
     </div>
   );
