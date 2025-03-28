@@ -3,7 +3,7 @@ export const APP_NAME = 'Knowledge Chat' as const;
 export const APP_DESC = 'Chat with your blog with ease' as const;
 
 export const LOCAL_STORAGE_KEY = '@knowledgechattoken' as const;
-
+export const SESSION_STORAGE_KEY = '@knowledge-chat-session-id' as const;
 export const PROMPT_CARDS = [
   {
     prompt: 'What are the best practices for SEO in 2024?',

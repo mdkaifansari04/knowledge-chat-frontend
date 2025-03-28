@@ -18,6 +18,8 @@ import { CopyToClipboard } from '../action/copy-to-clipboard';
 import { ReadAloud } from '../action/read-aloud';
 import { PromptCardLoadingView } from '../loading-view';
 import QueryWrapper from './wrapper';
+import { accessSessionStorge } from '@/lib/session-storage';
+import { useUser } from '@clerk/nextjs';
 
 interface MainResponseSectionProps {
   isDivisionOption: boolean;
@@ -75,6 +77,7 @@ function EmptyActivity() {
 type PromptInputBoxProps = MainResponseSectionProps;
 
 const PromptInputBox = ({ isDivisionOption }: PromptInputBoxProps) => {
+  const { user } = useUser();
   const [prompt, setPrompt] = useState('');
   const [knowledgebase, setKnowledgebase] = useState<string | null>(null);
   const { toast } = useToast();
@@ -112,6 +115,7 @@ const PromptInputBox = ({ isDivisionOption }: PromptInputBoxProps) => {
   const handleSubmit = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
     if (prompt.length === 0) return;
     if (!knowledgebase)
       return toast({
@@ -124,6 +128,8 @@ const PromptInputBox = ({ isDivisionOption }: PromptInputBoxProps) => {
       {
         userPrompt: prompt,
         indexName: knowledgebase!,
+        sessionId: accessSessionStorge.get()!,
+        userId: user?.id!,
       },
       {
         onSuccess: (response) => {
