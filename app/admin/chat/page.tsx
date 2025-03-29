@@ -2,7 +2,7 @@
 
 import { ChatCardPendingView } from '@/components/loading-view';
 import QueryWrapper from '@/components/shared/wrapper';
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Query } from '@/data-access/responseType';
 import { useGetQuery } from '@/hooks/query';
-import { exportChatHistory, formatDateWithHours, isLongMessage } from '@/lib/utils';
+import { cn, exportChatHistory, formatDateWithHours, isLongMessage } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { Calendar, ChevronDown, ChevronUp, Clock, Download, Pin, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -151,7 +151,9 @@ export default function ChatHistory() {
                             {session.messages.map((message) => (
                               <div key={message._id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 <div className={`flex ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'} items-start gap-2 max-w-[80%]`}>
-                                  <Avatar className={`h-8 w-8 ${message.sender === 'user' ? 'bg-primary' : 'bg-secondary'}`}>{message.sender === 'user' ? 'U' : 'AI'}</Avatar>
+                                  <Avatar className={cn('w-8 h-8 border', { 'p-1': message.sender === 'model' })}>
+                                    <AvatarImage src={message.sender === 'user' ? '/images/placeholder-user.jpg' : '/images/ai-profile.svg'} />
+                                  </Avatar>
                                   <div>
                                     <div className={`rounded-lg p-3 ${message.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
                                       {isLongMessage(message.text) && !expandedMessages[message._id] ? (
@@ -159,7 +161,7 @@ export default function ChatHistory() {
                                           <p className="whitespace-pre-line">{message.text.substring(0, 300)}...</p>
                                           <Button
                                             variant="link"
-                                            className="h-auto p-0 mt-1 text-xs"
+                                            className="h-auto p-0 mt-1 text-xs italic"
                                             onClick={(e) => {
                                               e.stopPropagation();
                                               toggleMessage(message._id);
