@@ -10,10 +10,7 @@ export interface AdminLoginResponse {
 
 export interface Analytics {
   usersCount: number;
-  queries: Array<{
-    timestamp: string;
-    id: string;
-  }>;
+  queries: Query[];
   totalStorageUsed: string;
   indexes: {
     name: string;

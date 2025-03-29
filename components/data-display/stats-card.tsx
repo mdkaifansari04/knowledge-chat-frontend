@@ -2,12 +2,13 @@
 
 import { Database, HardDrive, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Query } from '@/data-access/responseType';
 
 interface StatsCardsProps {
   data: {
     usersCount: number;
     totalStorageUsed: string;
-    queries: Array<{ timestamp: string; id: string }>;
+    queries: Query[];
     indexes: Array<{
       name: string;
       totalVectors: number;

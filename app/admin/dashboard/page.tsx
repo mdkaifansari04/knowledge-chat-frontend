@@ -6,9 +6,7 @@ import { StatsCards } from '@/components/data-display/stats-card';
 import { IndexLoadingView, QueryChartLoadingView, StatsCardLoadingView } from '@/components/loading-view';
 import QueryWrapper from '@/components/shared/wrapper';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGetAlalytics } from '@/hooks/query';
-import { BarChart, LineChart } from 'lucide-react';
 
 const Page: React.FC = () => {
   const { data, isPending, isError, error } = useGetAlalytics();

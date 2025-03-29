@@ -3,12 +3,10 @@
 import { useMemo } from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Query } from '@/data-access/responseType';
 
 interface QueriesChartProps {
-  queries: Array<{
-    timestamp: string;
-    id: string;
-  }>;
+  queries: Query[];
 }
 
 export function QueriesChart({ queries }: QueriesChartProps) {
@@ -16,7 +14,7 @@ export function QueriesChart({ queries }: QueriesChartProps) {
   const queryData = useMemo(() => {
     const groupedByDay = queries.reduce(
       (acc, query) => {
-        const date = new Date(query.timestamp);
+        const date = new Date(query.createdAt);
         const day = date.toISOString().split('T')[0];
 
         if (!acc[day]) {
