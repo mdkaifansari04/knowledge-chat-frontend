@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Query } from '@/data-access/responseType';
 import { useGetQuery } from '@/hooks/query';
-import { exportChatHistory } from '@/lib/utils';
+import { exportChatHistory, formatDateWithHours, isLongMessage } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { Calendar, ChevronDown, ChevronUp, Clock, Download, Pin, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -79,20 +79,6 @@ export default function ChatHistory() {
   };
 
   // Format date for display
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const isLongMessage = (text: string) => text.length > 300;
-
-  // Export chat history as JSON
 
   return (
     <div className={`min-h-screen`}>
@@ -140,21 +126,18 @@ export default function ChatHistory() {
               <>
                 {filteredSessions.map((session) => (
                   <Card key={session._id} className="mb-6 overflow-hidden">
-                    <CardHeader className="flex flex-row items-center justify-between pb-2 cursor-pointer" onClick={() => toggleSession(session._id)}>
+                    <CardHeader className="flex flex-row items-center justify-between py-6 cursor-pointer" onClick={() => toggleSession(session._id)}>
                       <div className="flex items-center space-x-2">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
-                        <h3 className="font-medium">Session {formatDate(session.createdAt)}</h3>
+                        <h3 className="font-medium">Session {formatDateWithHours(session.createdAt)}</h3>
                         <Badge variant="outline" className="ml-2">
                           {session.messages.length} messages
                         </Badge>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Button variant="ghost" size="icon">
+                        {/* <Button variant="ghost" size="icon">
                           <Pin className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
+                        </Button> */}
                         {expandedSessions[session._id] ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                       </div>
                     </CardHeader>

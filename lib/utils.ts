@@ -73,3 +73,16 @@ export const exportChatHistory = (chatSessions: Query[]) => {
   linkElement.setAttribute('download', exportFileDefaultName);
   linkElement.click();
 };
+
+export const formatDateWithHours = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+export const isLongMessage = (text: string) => text.length > 300;

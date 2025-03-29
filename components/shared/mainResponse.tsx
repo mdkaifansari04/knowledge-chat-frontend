@@ -3,11 +3,13 @@ import { Loader } from '@/components/shared/loader';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { useChatWithKnowledgebase } from '@/hooks/mutation';
+import { useChatWithKnowledgeBase } from '@/hooks/mutation';
 import { useGetKnowledgebase } from '@/hooks/query';
 import { useToast } from '@/hooks/use-toast';
+import { accessSessionStorge } from '@/lib/session-storage';
 import { cn, getErrorMessage, getUserShortName } from '@/lib/utils';
 import useChatStore from '@/store/chat';
+import { useUser } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
 import { LineChart, SendIcon, ShieldCheck, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -18,8 +20,6 @@ import { CopyToClipboard } from '../action/copy-to-clipboard';
 import { ReadAloud } from '../action/read-aloud';
 import { PromptCardLoadingView } from '../loading-view';
 import QueryWrapper from './wrapper';
-import { accessSessionStorge } from '@/lib/session-storage';
-import { useUser } from '@clerk/nextjs';
 
 interface MainResponseSectionProps {
   isDivisionOption: boolean;
@@ -82,7 +82,7 @@ const PromptInputBox = ({ isDivisionOption }: PromptInputBoxProps) => {
   const [knowledgebase, setKnowledgebase] = useState<string | null>(null);
   const { toast } = useToast();
   const ChatStore = useChatStore();
-  const { mutate: chatwithKnowledgebase, isPending: isProcessing } = useChatWithKnowledgebase();
+  const { mutate: chatwithKnowledgebase, isPending: isProcessing } = useChatWithKnowledgeBase();
   const { data: knowledgebases, isError, error, isPending } = useGetKnowledgebase();
 
   const handleStream = async (response: Response) => {
