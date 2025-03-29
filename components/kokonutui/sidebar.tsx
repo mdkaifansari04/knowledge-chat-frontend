@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart2, LogOut, Menu } from 'lucide-react';
+import { BarChart2, LogOut, Menu, MessageCircle } from 'lucide-react';
 
 import { accessTokenStorage } from '@/lib/token-storage';
 import { Home } from 'lucide-react';
@@ -74,6 +74,7 @@ export default function Sidebar() {
                 <div className="space-y-1">
                   <NavItem text="Dashboard" href="/admin/dashboard" icon={Home} />
                   <NavItem text="Upload" href="/admin/upload" icon={BarChart2} />
+                  <NavItem text="Chat" href="/admin/chat" icon={MessageCircle} />
                 </div>
               </div>
 

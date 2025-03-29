@@ -1,5 +1,6 @@
+import { Query } from '@/data-access/responseType';
 import { Question } from '@/types';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -59,4 +60,16 @@ export const formatDate = (dateString: string) => {
 export const isValidYouTubeUrl = (url: string): boolean => {
   const regex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
   return regex.test(url);
+};
+
+export const exportChatHistory = (chatSessions: Query[]) => {
+  const dataStr = JSON.stringify(chatSessions, null, 2);
+  const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
+
+  const exportFileDefaultName = `chat-history-${new Date().toISOString().slice(0, 10)}.json`;
+
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', exportFileDefaultName);
+  linkElement.click();
 };

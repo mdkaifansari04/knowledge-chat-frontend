@@ -1,12 +1,12 @@
 import * as Admin from '@/data-access/admin';
-import * as AIModel from '@/data-access/aiModel';
+import * as KnowledgeBase from '@/data-access/knowledge-base';
 
 import { useMutation } from '@tanstack/react-query';
 
-export function useChatWithKnowledgebase() {
+export function useChatWithKnowledgeBase() {
   return useMutation({
-    mutationKey: ['chat-with-knowledgebase'],
-    mutationFn: AIModel.chatWithKnowledgebase,
+    mutationKey: ['chat-with-KnowledgeBase'],
+    mutationFn: KnowledgeBase.chatWithKnowledgebase,
   });
 }
 
@@ -20,26 +20,26 @@ export function useAdminLogin() {
 export function useUploadDocument() {
   return useMutation({
     mutationKey: ['admin-upload-document'],
-    mutationFn: Admin.uploadDocument,
+    mutationFn: KnowledgeBase.uploadDocument,
   });
 }
 
 export function useUploadYTVideo() {
   return useMutation({
     mutationKey: ['admin-upload-YT-video'],
-    mutationFn: Admin.uploadYTVideo,
+    mutationFn: KnowledgeBase.uploadYTVideo,
   });
 }
 export function useUploadText() {
   return useMutation({
     mutationKey: ['admin-upload-text'],
-    mutationFn: Admin.uploadText,
+    mutationFn: KnowledgeBase.uploadText,
   });
 }
 
 export function useMediaUpload() {
   return useMutation({
     mutationKey: ['admin-upload-media'],
-    mutationFn: Admin.uploadMedia,
+    mutationFn: KnowledgeBase.uploadMedia,
   });
 }

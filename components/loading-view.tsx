@@ -1,5 +1,7 @@
 import { Skeleton } from './ui/skeleton';
 
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+
 export const StatsCardLoadingView = () => {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -65,5 +67,30 @@ export const PromptCardLoadingView = () => {
       <Skeleton className="w-[250px] h-[53px] rounded-md" />
       <Skeleton className="w-[250px] h-[53px] rounded-md" />
     </div>
+  );
+};
+
+export const ChatCardPendingView = () => {
+  return (
+    <div className="grid grid-cols-1 gap-3">
+      <ChatCard />
+      <ChatCard />
+      <ChatCard />
+      <ChatCard />
+    </div>
+  );
+};
+
+const ChatCard = () => {
+  return (
+    <Card className="mb-6">
+      <CardHeader className="pb-2">
+        <Skeleton className="w-48 h-6" />
+      </CardHeader>
+      <CardContent>
+        <Skeleton className="w-full h-24 mb-4" />
+        <Skeleton className="w-full h-24" />
+      </CardContent>
+    </Card>
   );
 };
